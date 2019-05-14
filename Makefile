@@ -7,7 +7,6 @@ POSTGRES_PORT_BIND=-p 5432:5432
 THEMIS_PORTBIND=-p 8080:8080
 THEMIS_DB_URL=postgresql://faster:faster_password@localhost:5432/faster
 
-
 usage:             ## Show this help
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
