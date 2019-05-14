@@ -38,7 +38,6 @@ docker-themis:        ## Run Themis in local Docker container
 
 docker-postgres:
 	docker run -d --rm --name faster-postgres \
-	    --network faster-net \
 		-e POSTGRES_USER=faster \
 		-e POSTGRES_PASSWORD=faster_password \
 		-v faster-pgdata:/var/lib/postgresql/data \
@@ -66,7 +65,6 @@ lint:              ## Run code linter to check code style
 	($(VENV_RUN); pep8 --max-line-length=120 --ignore=E128 --exclude=web,bin,$(VENV_DIR) .)
 
 server:           ## Start the server on port 8081
-
 	(export THEMIS_DB_URL="$(THEMIS_DB_URL)" && $(VENV_RUN) && eval `ssh-agent -s` && PYTHONPATH=$(dir)/src:$$PYTHONPATH bin/themis server_and_loop --port=8081 --log=themis.log)
 
 .PHONY: build test
