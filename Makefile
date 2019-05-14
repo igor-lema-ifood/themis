@@ -1,9 +1,8 @@
 dir = $(shell pwd)
 VENV_DIR = .venv
-IMAGE_NAME = atlassianlabs/themis
-# VENV_RUN = . $(VENV_DIR)/bin/activate
-# TODO: there is a bug in some virtualenv environments, we need to manually include this path here
+IMAGE_NAME = themis
 VENV_RUN = . $(VENV_DIR)/bin/activate && export PYTHONPATH=.venv/lib64/python2.7/dist-packages
+AWS_PROFILE = faster
 POSTGRES_PORT_BIND=-p 5432:5432
 THEMIS_PORTBIND=-p 8080:8080
 THEMIS_DB_URL=postgresql://faster:faster_password@localhost:5432/faster
@@ -27,22 +26,17 @@ install-prereq:    ## Install prerequisites via apt-get or yum (if available)
 npm:               ## Install node.js/npm dependencies
 	cd $(dir)/themis/web/ && npm install
 
-publish:           ## Publish the library to PyPi
-	($(VENV_RUN); ./setup.py sdist upload)
-
-coveralls:         ## Publish coveralls metrics
-	($(VENV_RUN); coveralls)
-
 docker-build:      ## Build the Docker image
 	@docker build -t $(IMAGE_NAME) .
 
-docker-push:       ## Push image to Docker hub
-	docker push $(IMAGE_NAME)
-
 docker-themis:        ## Run Themis in local Docker container
-	docker run -it $(THEMIS_PORTBIND) -e THEMIS_DB_PASSWORD=$(THEMIS_DB_PASSWORD) -e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) -e AWS_SECRET_ACCESS_KEY="$(AWS_SECRET_ACCESS_KEY)" -e AWS_SESSION_TOKEN="$(AWS_SESSION_TOKEN)" -e SSH_KEY_ETL_PROD="$(SSH_KEY_ETL_PROD)" -e  $(IMAGE_NAME) server_and_loop --port=8080
+	@docker run -it -p 8080:8080 \
+	-e THEMIS_DB_PASSWORD=$(THEMIS_DB_PASSWORD) \
+	-v ~/.aws/credentials:/root/.aws/credentials \
+	-e AWS_PROFILE=$(AWS_PROFILE) \
+	$(IMAGE_NAME) 
 
-docker-postgres:	
+docker-postgres:
 	docker run -d --rm --name faster-postgres \
 	    --network faster-net \
 		-e POSTGRES_USER=faster \
@@ -50,6 +44,19 @@ docker-postgres:
 		-v faster-pgdata:/var/lib/postgresql/data \
 		$(POSTGRES_PORT_BIND) \
 		postgres:9.6-alpine
+
+docker-login:
+	$(aws ecr get-login --no-include-email --region us-east-1 --profile faster)
+
+docker-tag:
+	docker tag themis:latest 087833863386.dkr.ecr.us-east-1.amazonaws.com/themis:latest
+
+docker-push:
+	docker push 087833863386.dkr.ecr.us-east-1.amazonaws.com/themis:latest
+	
+release: docker-login docker-tag docker-push
+
+docker: docker-build docker-run
 
 test:              ## Run tests
 	($(VENV_RUN) && PYTHONPATH=$(dir)/test:$$PYTHONPATH nosetests --nocapture --no-skip --with-coverage --with-xunit --cover-package=themis test/) && \
