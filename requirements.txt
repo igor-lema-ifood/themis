@@ -11,6 +11,7 @@ pep8==1.7.0
 pandas==0.18.1
 pyhive==0.1.6
 PyMySQL==0.7.9
+psycopg2-binary==2.8.2
 python-coveralls==2.7.0
 requests==2.10.0
 scipy==0.17.0

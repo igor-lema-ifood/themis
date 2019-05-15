@@ -2,7 +2,6 @@ dir = $(shell pwd)
 VENV_DIR = .venv
 IMAGE_NAME = themis
 VENV_RUN = . $(VENV_DIR)/bin/activate && export PYTHONPATH=.venv/lib64/python2.7/dist-packages
-AWS_PROFILE = faster
 POSTGRES_PORT_BIND=-p 5432:5432
 THEMIS_PORTBIND=-p 8080:8080
 THEMIS_DB_URL=postgresql://faster:faster_password@localhost:5432/faster
@@ -32,8 +31,7 @@ docker-themis:        ## Run Themis in local Docker container
 	@docker run -it -p 8080:8080 \
 	-e THEMIS_DB_PASSWORD=$(THEMIS_DB_PASSWORD) \
 	-v ~/.aws/credentials:/root/.aws/credentials \
-	-e AWS_PROFILE=$(AWS_PROFILE) \
-	$(IMAGE_NAME) 
+	$(IMAGE_NAME)
 
 docker-postgres:
 	docker run -d --rm --name faster-postgres \
@@ -44,7 +42,7 @@ docker-postgres:
 		postgres:9.6-alpine
 
 docker-login:
-	$(aws ecr get-login --no-include-email --region us-east-1 --profile faster)
+	$(aws ecr get-login --no-include-email --region us-east-1)
 
 docker-tag:
 	docker tag themis:latest 087833863386.dkr.ecr.us-east-1.amazonaws.com/themis:latest
@@ -54,7 +52,7 @@ docker-push:
 	
 release: docker-login docker-tag docker-push
 
-docker: docker-build docker-run
+docker: docker-build docker-themis
 
 test:              ## Run tests
 	($(VENV_RUN) && PYTHONPATH=$(dir)/test:$$PYTHONPATH nosetests --nocapture --no-skip --with-coverage --with-xunit --cover-package=themis test/) && \
