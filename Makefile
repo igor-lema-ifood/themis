@@ -54,7 +54,7 @@ docker-push:
 	
 release: docker-login docker-tag docker-push
 
-docker: docker-build docker-run
+docker: docker-build docker-themis
 
 test:              ## Run tests
 	($(VENV_RUN) && PYTHONPATH=$(dir)/test:$$PYTHONPATH nosetests --nocapture --no-skip --with-coverage --with-xunit --cover-package=themis test/) && \
