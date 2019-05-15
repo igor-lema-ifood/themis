@@ -30,11 +30,12 @@ docker-build:      ## Build the Docker image
 docker-themis:        ## Run Themis in local Docker container
 	@docker run -it -p 8080:8080 \
 	-e THEMIS_DB_PASSWORD=$(THEMIS_DB_PASSWORD) \
+	-e THEMIS_DB_URL=$(THEMIS_DB_URL) \
 	-v ~/.aws/credentials:/root/.aws/credentials \
 	$(IMAGE_NAME)
 
 docker-postgres:
-	docker run -d --rm --name faster-postgres \
+	docker run -d --rm --name faster \
 		-e POSTGRES_USER=faster \
 		-e POSTGRES_PASSWORD=faster_password \
 		-v faster-pgdata:/var/lib/postgresql/data \
