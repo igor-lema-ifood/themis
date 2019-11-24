@@ -1,5 +1,5 @@
-awscli==1.10.32
-boto3==1.4.1
+awscli==1.16.232
+boto3==1.9.220
 coverage==4.0.3
 cssselect==0.9.1
 docopt==0.6.2

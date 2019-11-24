@@ -132,14 +132,14 @@ def perform_scaling(kinesis_stream):
     upscale = get_upscale_shards(kinesis_stream)
     action = 'NOTHING'
     role = kinesis_monitoring.get_iam_role_for_stream(kinesis_stream)
-    kinesis_client = aws_common.connect_kinesis(role=role)
     try:
+        kinesis_client = aws_common.connect_kinesis(role=role)
         if downscale:
             action = 'DOWNSCALE(-%s)' % len(downscale)
-            scale_down(downscale)
+            scale_down(downscale, kinesis_client, kinesis_stream)
         elif upscale:
             action = 'UPSCALE(+%s)' % len(upscale)
-            scale_up(upscale)
+            scale_up(upscale, kinesis_client, kinesis_stream)
             
     except Exception, e:
         LOG.warning('Unable to re-scale stream %s: %s' % (kinesis_stream.id, e))
