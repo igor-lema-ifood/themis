@@ -110,7 +110,7 @@ def scale_down(downscale, kinesis_client, kinesis_stream):
 
 def scale_up(upscale, kinesis_client, kinesis_stream):
     target_count = len(upscale) + len(kinesis_stream.shards)
-    LOG.info("Trying to scale Kinesis stream %s to %d" % (shard.id, target_count))
+    LOG.info("Trying to scale Kinesis stream %s to %d" % (kinesis_stream.shards, target_count))
     try:
         kinesis_client.update_shard_count(StreamName=kinesis_stream.id, 
             TargetShardCount=target_count,
