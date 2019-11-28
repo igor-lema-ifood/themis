@@ -39,6 +39,7 @@ def get_downscale_shards(stream, config=None):
     if not config:
         config = themis.config.get_config()
     expr = config.get(SECTION_KINESIS, stream.id, KEY_STREAM_DOWNSCALE_EXPR)
+    LOG.info("Down Scale Expression %s " % (expr))
     num_downsize = execute_dsl_string(expr, stream.monitoring_data, config=config)
     LOG.info("Kinesis Stream %s: num_downsize: %s" % (stream.id, num_downsize))
     if not isinstance(num_downsize, int) or num_downsize <= 0:
@@ -59,6 +60,7 @@ def get_upscale_shards(stream, config=None):
     if not config:
         config = themis.config.get_config()
     expr = config.get(SECTION_KINESIS, stream.id, KEY_STREAM_UPSCALE_EXPR)
+    LOG.info("Up Scale Expression %s " % (expr))
     num_upsize = execute_dsl_string(expr, stream.monitoring_data, config=config)
     LOG.info("Kinesis Stream %s: num_upsize: %s" % (stream.id, num_upsize))
     if not isinstance(num_upsize, int) or num_upsize <= 0:
